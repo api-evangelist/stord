@@ -1,0 +1,74 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://www.stord.com/",
+  "name": "Stord",
+  "description": "Stord is a commerce fulfillment platform that combines physical warehouse infrastructure with integrated software to manage omnichannel logistics for DTC and B2B brands.",
+  "url": "https://www.stord.com/",
+  "logo": "https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg",
+  "sameAs": [
+    "https://github.com/stordco",
+    "https://www.linkedin.com/company/stord",
+    "https://x.com/getstord"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "sales",
+    "url": "https://www.stord.com/integrations"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Stord Commerce Fulfillment Platform",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "name": "Stord One Commerce (OMS)",
+        "description": "Order management system with 100+ integrations for omnichannel commerce",
+        "url": "https://www.stord.com/integrations"
+      },
+      {
+        "@type": "Offer",
+        "name": "Stord One Warehouse (WMS)",
+        "description": "Warehouse management system with real-time supply chain visibility",
+        "url": "https://www.stord.com/integrations"
+      },
+      {
+        "@type": "Offer",
+        "name": "Stord API",
+        "description": "REST API for managing orders, inventory, shipments, and returns",
+        "url": "https://www.stord.com/integrations"
+      }
+    ]
+  },
+  "knowsAbout": [
+    "Commerce Fulfillment",
+    "Order Management",
+    "Inventory Management",
+    "Shipment Tracking",
+    "Returns Management",
+    "Warehouse Management",
+    "Logistics",
+    "Supply Chain",
+    "Shopify Integration",
+    "BigCommerce Integration",
+    "ERP Integration",
+    "EDI"
+  ],
+  "foundingLocation": {
+    "@type": "Place",
+    "name": "Atlanta, Georgia, USA"
+  },
+  "numberOfEmployees": {
+    "@type": "QuantitativeValue",
+    "value": 4000
+  },
+  "makesOffer": {
+    "@type": "Offer",
+    "name": "Fulfillment Network",
+    "description": "20+ fulfillment nodes across the US reaching nearly one-fourth of US households",
+    "areaServed": {
+      "@type": "Country",
+      "name": "United States"
+    }
+  }
+}

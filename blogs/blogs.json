@@ -1,0 +1,40 @@
+{
+  "aid": "stord",
+  "name": "Stord Blog",
+  "url": "https://www.stord.com/blog",
+  "lastFetched": "2026-06-13",
+  "posts": [
+    {
+      "title": "$250M at $3B. The Physical Intelligence Layer for Commerce",
+      "date": "2026-05-26",
+      "author": "Sean Henry, CEO",
+      "url": "https://www.stord.com/blog/the-physical-intelligence-layer-for-commerce",
+      "category": "Company News",
+      "file": "2026-05-26-the-physical-intelligence-layer-for-commerce.md"
+    },
+    {
+      "title": "Stord Labs: Building Physical Intelligence for Commerce",
+      "date": "2026-05-26",
+      "author": "Chris Lobo, VP of Network Innovation",
+      "url": "https://www.stord.com/blog/stord-labs-building-physical-intelligence-for-commerce",
+      "category": "Network Optimization",
+      "file": "2026-05-26-stord-labs-building-physical-intelligence-for-commerce.md"
+    },
+    {
+      "title": "Engineering Fulfillment to Thrive in E-Commerce Volatility",
+      "date": "2026-04-29",
+      "author": "Jessica Perry, Program Manager, Quality",
+      "url": "https://www.stord.com/blog/thrive-in-ecommerce-volatility-with-fulfillment",
+      "category": "Fulfillment",
+      "file": "2026-04-29-engineering-fulfillment-to-thrive-in-ecommerce-volatility.md"
+    },
+    {
+      "title": "Last-Mile Transportation Problems & How to Fix Them",
+      "date": "2026-04-24",
+      "author": "Stord",
+      "url": "https://www.stord.com/blog/optimizing-the-last-mile-of-delivery",
+      "category": "Fulfillment",
+      "file": "2026-04-24-last-mile-transportation-problems-and-how-to-fix-them.md"
+    }
+  ]
+}

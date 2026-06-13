@@ -1,0 +1,57 @@
+name: Stord FinOps
+description: >
+  Financial operations considerations for teams consuming Stord's platform and
+  APIs. Stord bundles logistics infrastructure with software, making cost
+  attribution across engineering and operations budgets important to establish
+  upfront during contract negotiation.
+url: https://www.stord.com/pricing
+model: contract-based
+cost_visibility: low
+public_pricing: false
+budget_considerations:
+  - name: Per-Order Fulfillment Cost
+    description: >
+      Estimated $3-7 per order for most merchants. Volume discounts apply at
+      higher throughput tiers negotiated in the master agreement.
+    unit: per-order
+    variability: high
+  - name: Monthly Storage Fees
+    description: >
+      Charged monthly based on cubic footage or pallet positions. Underestimated
+      storage costs are a common source of budget overrun.
+    unit: per-month
+    variability: high
+  - name: Technology Platform Fee
+    description: >
+      Bundled OMS and WMS software access. Costs are tied to operational scope
+      and not itemized separately in standard contracts.
+    unit: per-month
+    variability: medium
+  - name: Integration Setup
+    description: >
+      EDI, API, and flat-file integration setup may carry one-time or ongoing
+      fees depending on the complexity of the connection.
+    unit: one-time-or-recurring
+    variability: medium
+  - name: Returns Processing
+    description: >
+      Returns management fees apply per unit processed back into inventory or
+      disposed of; rates vary by SKU type and condition assessment.
+    unit: per-unit
+    variability: medium
+optimization_tips:
+  - Consolidate SKUs and minimize storage footprint to reduce monthly storage fees
+  - Negotiate volume tiers upfront based on projected order growth
+  - Evaluate multi-year contracts for favorable per-order rates
+  - Use Stord's AI-powered parcel optimization to reduce last-mile shipping costs (up to 10% per parcel)
+  - Clarify API and EDI integration fees in contract before signing
+  - Monitor the status page at https://status.stord.com to track platform uptime and incident costs
+cost_attribution:
+  notes: >
+    Because Stord bundles fulfillment services and technology into a single
+    agreement, teams should establish clear cost attribution between operations
+    and engineering budgets during onboarding. Request itemized line items in
+    the Statement of Work for platform fees vs. logistics fees.
+contacts:
+  sales: sales@stord.com
+  phone: "(833) 700-2025"

@@ -1,0 +1,39 @@
+name: Stord API Rate Limits
+description: >
+  Stord does not publish public API rate limit documentation. The platform uses
+  a REST API built with an API-first design philosophy using JSON:API specification
+  standards and OpenAPI annotations. Access to rate limit details requires direct
+  engagement with a Stord representative and access to private API documentation.
+  Standard HTTP 429 (Too Many Requests) responses with Retry-After headers are
+  used when limits are exceeded, consistent with Stord's API-over-HTTPS approach.
+documented: false
+contact:
+  description: Contact your Stord account representative for API access credentials and rate limit details
+  email: sales@stord.com
+api:
+  style: REST
+  format: JSON:API
+  transport: HTTPS
+  specification: OpenAPI
+authentication:
+  methods:
+    - name: API Key
+      description: >
+        API Key, Organisation ID, Network ID, and Facility ID required per
+        warehouse location. Credentials obtained through Stord representative.
+    - name: Bearer Token
+      description: Bearer token authentication over HTTPS
+  notes: >
+    To obtain API access, contact your Stord representative for API Key,
+    Organisation ID, Network ID, and Facility ID for each warehouse location.
+error_codes:
+  - code: 429
+    meaning: Too Many Requests — rate limit exceeded; respect Retry-After header
+  - code: 401
+    meaning: Unauthorized — invalid or missing API credentials
+  - code: 403
+    meaning: Forbidden — insufficient permissions for the requested resource
+notes: >
+  Stord uses Postman for API design, mocking, examples, and documentation.
+  Rate limit specifics are not publicly disclosed and are governed by individual
+  customer agreements.

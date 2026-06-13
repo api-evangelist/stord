@@ -1,0 +1,41 @@
+name: Stord Plans and Pricing
+description: >
+  Stord does not publish public pricing tiers. The platform operates on a custom
+  quote model negotiated per fulfillment network agreement. Pricing bundles both
+  logistics services and technology, making it difficult to isolate software costs
+  from fulfillment costs. Prospective customers must contact Stord's sales team
+  directly for a quote.
+url: https://www.stord.com/pricing
+contact:
+  email: sales@stord.com
+  phone: "(833) 700-2025"
+model: custom-quote
+tiers:
+  - name: Custom Fulfillment Agreement
+    description: >
+      Negotiated per-customer contract covering fulfillment, warehousing, and
+      technology platform access. No self-serve sign-up; onboarding requires
+      direct sales engagement.
+    pricing: contact-for-quote
+    components:
+      - name: Fulfillment Handling Fees
+        description: Per-order pick, pack, and ship fees; estimated $3-7 per order for most merchants
+        unit: per-order
+      - name: Storage Fees
+        description: Monthly storage assessed on cubic footage or pallet positions across Stord's fulfillment network
+        unit: per-month
+      - name: Software Platform Fee
+        description: >
+          Access to Stord One Commerce (OMS) and Stord One Warehouse (WMS);
+          bundled with operational scope and contract length
+        unit: per-month
+factors:
+  - Fulfillment volume — higher volumes unlock better per-unit rates
+  - Storage footprint — multi-SKU and large-format inventory increases costs
+  - Geographic distribution — multi-node positioning may increase fees
+  - Contract term — longer commitments typically yield more favorable rates
+  - Integration complexity — EDI, API, or flat-file connectivity may carry setup fees
+notes: >
+  API and EDI connectivity capabilities are included within the Stord One Commerce
+  platform. There are no publicly documented API-specific pricing tiers separate
+  from the main fulfillment agreement.

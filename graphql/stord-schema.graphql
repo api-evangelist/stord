@@ -1,0 +1,1145 @@
+"""
+Stord Commerce Fulfillment Platform - Conceptual GraphQL Schema
+Derived from the Stord REST API (https://www.stord.com/integrations)
+Covers orders, inventory, warehouse, shipments, returns, and platform management.
+"""
+
+# -------------------------------------------------
+# Scalars
+# -------------------------------------------------
+
+scalar DateTime
+scalar Date
+scalar Decimal
+scalar JSON
+
+# -------------------------------------------------
+# Pagination
+# -------------------------------------------------
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+  totalCount: Int!
+}
+
+input PageInput {
+  first: Int
+  after: String
+  last: Int
+  before: String
+}
+
+# -------------------------------------------------
+# Enumerations
+# -------------------------------------------------
+
+enum OrderStatusValue {
+  PENDING
+  PROCESSING
+  AWAITING_SHIPMENT
+  PARTIALLY_SHIPPED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  ON_HOLD
+  EXCEPTION
+}
+
+enum OrderTypeValue {
+  DTC
+  B2B
+  TRANSFER
+  RETURN
+}
+
+enum OrderSourceValue {
+  SHOPIFY
+  BIGCOMMERCE
+  MAGENTO
+  WOOCOMMERCE
+  AMAZON
+  EDI
+  API
+  MANUAL
+  NETSUITE
+}
+
+enum ReceivingStatusValue {
+  EXPECTED
+  IN_PROGRESS
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CLOSED
+  CANCELLED
+}
+
+enum ShipmentStatusValue {
+  LABEL_CREATED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  EXCEPTION
+  RETURNED
+}
+
+enum ReturnStatusValue {
+  REQUESTED
+  AUTHORIZED
+  IN_TRANSIT
+  RECEIVED
+  INSPECTING
+  RESTOCKED
+  REFUNDED
+  REJECTED
+  CLOSED
+}
+
+enum WebhookEventType {
+  ORDER_CREATED
+  ORDER_UPDATED
+  ORDER_CANCELLED
+  ORDER_SHIPPED
+  ORDER_DELIVERED
+  SHIPMENT_CREATED
+  SHIPMENT_UPDATED
+  SHIPMENT_DELIVERED
+  INVENTORY_UPDATED
+  RECEIVING_COMPLETED
+  RETURN_CREATED
+  RETURN_RECEIVED
+  RETURN_COMPLETED
+  ASN_CREATED
+  ASN_RECEIVED
+}
+
+enum ReportType {
+  INVENTORY_SNAPSHOT
+  ORDER_SUMMARY
+  SHIPMENT_SUMMARY
+  RETURNS_SUMMARY
+  RECEIVING_SUMMARY
+  LOT_TRACE
+  SERIAL_TRACE
+  CARRIER_PERFORMANCE
+}
+
+enum LabelFormat {
+  ZPL
+  PDF
+  PNG
+}
+
+enum AdjustmentReason {
+  CYCLE_COUNT
+  DAMAGE
+  RECEIVING_DISCREPANCY
+  TRANSFER
+  RETURN_TO_STOCK
+  WRITE_OFF
+  MANUAL
+}
+
+# -------------------------------------------------
+# Channel
+# -------------------------------------------------
+
+"""Details about a sales channel (e.g. Shopify store, Amazon marketplace)."""
+type ChannelDetails {
+  id: ID!
+  name: String!
+  platform: OrderSourceValue!
+  externalId: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to a sales channel."""
+type Channel {
+  id: ID!
+  details: ChannelDetails
+}
+
+# -------------------------------------------------
+# Product / SKU / Barcode / Weight / Dimensions
+# -------------------------------------------------
+
+"""A barcode associated with a product or SKU."""
+type Barcode {
+  id: ID!
+  value: String!
+  type: String!
+  isPrimary: Boolean!
+}
+
+"""Physical weight measurement."""
+type Weight {
+  value: Decimal!
+  unit: String!
+}
+
+"""Physical dimensions of a product or package."""
+type Dimensions {
+  length: Decimal!
+  width: Decimal!
+  height: Decimal!
+  unit: String!
+}
+
+"""A product variant (e.g. size, color combination)."""
+type VariantDetails {
+  id: ID!
+  sku: String!
+  name: String!
+  attributes: JSON
+  weight: Weight
+  dimensions: Dimensions
+  barcodes: [Barcode!]!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to a product variant."""
+type Variant {
+  id: ID!
+  details: VariantDetails
+}
+
+"""A Stock Keeping Unit."""
+type SKU {
+  id: ID!
+  code: String!
+  description: String
+  variants: [Variant!]!
+  barcodes: [Barcode!]!
+  weight: Weight
+  dimensions: Dimensions
+  isHazmat: Boolean!
+  isFragile: Boolean!
+  requiresLotTracking: Boolean!
+  requiresSerialTracking: Boolean!
+}
+
+"""Detailed product record."""
+type ProductDetails {
+  id: ID!
+  name: String!
+  description: String
+  brand: String
+  category: String
+  skus: [SKU!]!
+  variants: [Variant!]!
+  barcodes: [Barcode!]!
+  weight: Weight
+  dimensions: Dimensions
+  externalId: String
+  tags: [String!]!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to a product."""
+type Product {
+  id: ID!
+  details: ProductDetails
+}
+
+# -------------------------------------------------
+# Inventory
+# -------------------------------------------------
+
+"""Inventory quantity at a specific location."""
+type InventoryLevel {
+  locationId: ID!
+  quantityOnHand: Int!
+  quantityAvailable: Int!
+  quantityReserved: Int!
+  quantityIncoming: Int!
+}
+
+"""A physical location within a warehouse where inventory is stored."""
+type InventoryLocation {
+  id: ID!
+  warehouseId: ID!
+  zone: String
+  aisle: String
+  bay: String
+  level: String
+  position: String
+  locationType: String
+  isPickable: Boolean!
+  isReceivable: Boolean!
+}
+
+"""A recorded adjustment to inventory quantity."""
+type InventoryAdjustment {
+  id: ID!
+  skuId: ID!
+  locationId: ID!
+  quantityBefore: Int!
+  quantityAfter: Int!
+  adjustmentQuantity: Int!
+  reason: AdjustmentReason!
+  notes: String
+  adjustedBy: String
+  adjustedAt: DateTime!
+}
+
+"""Detailed inventory record for a SKU."""
+type InventoryDetails {
+  id: ID!
+  sku: SKU!
+  totalOnHand: Int!
+  totalAvailable: Int!
+  totalReserved: Int!
+  totalIncoming: Int!
+  levels: [InventoryLevel!]!
+  recentAdjustments: [InventoryAdjustment!]!
+  updatedAt: DateTime!
+}
+
+"""Top-level inventory reference."""
+type Inventory {
+  id: ID!
+  skuId: ID!
+  details: InventoryDetails
+}
+
+# -------------------------------------------------
+# Warehouse / Zone / Location
+# -------------------------------------------------
+
+"""Details about a zone within a warehouse."""
+type Zone {
+  id: ID!
+  warehouseId: ID!
+  name: String!
+  code: String
+  description: String
+  locations: [InventoryLocation!]!
+}
+
+"""Details about a specific location within a warehouse."""
+type LocationDetails {
+  id: ID!
+  warehouseId: ID!
+  zone: Zone
+  code: String!
+  description: String
+  locationType: String!
+  capacity: Int
+  currentOccupancy: Int
+  isActive: Boolean!
+}
+
+"""A physical warehouse location record."""
+type WarehouseLocation {
+  id: ID!
+  details: LocationDetails
+}
+
+"""Detailed information about a warehouse/fulfillment center."""
+type WarehouseDetails {
+  id: ID!
+  name: String!
+  code: String!
+  address: JSON
+  phone: String
+  email: String
+  timezone: String!
+  isActive: Boolean!
+  zones: [Zone!]!
+  locations: [WarehouseLocation!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to a warehouse/fulfillment node."""
+type Warehouse {
+  id: ID!
+  details: WarehouseDetails
+}
+
+# -------------------------------------------------
+# ASN (Advanced Shipping Notice)
+# -------------------------------------------------
+
+"""Detailed ASN information for an inbound shipment."""
+type ASNDetails {
+  id: ID!
+  referenceNumber: String!
+  supplierId: ID
+  supplierName: String
+  warehouseId: ID!
+  expectedArrival: Date
+  carrier: String
+  trackingNumber: String
+  lineItems: [ReceivingLineItem!]!
+  status: ReceivingStatusValue!
+  notes: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to an Advanced Shipping Notice."""
+type ASN {
+  id: ID!
+  details: ASNDetails
+}
+
+# -------------------------------------------------
+# Receiving
+# -------------------------------------------------
+
+"""A line item within a receiving order."""
+type ReceivingLineItem {
+  id: ID!
+  receivingOrderId: ID!
+  sku: SKU!
+  quantityExpected: Int!
+  quantityReceived: Int!
+  quantityDamaged: Int
+  lotNumber: String
+  serialNumbers: [String!]
+  notes: String
+}
+
+"""Current status of a receiving order."""
+type ReceivingStatus {
+  value: ReceivingStatusValue!
+  updatedAt: DateTime!
+  notes: String
+}
+
+"""A receiving order for inbound inventory."""
+type ReceivingOrder {
+  id: ID!
+  asnId: ID
+  warehouseId: ID!
+  referenceNumber: String!
+  status: ReceivingStatus!
+  lineItems: [ReceivingLineItem!]!
+  expectedArrival: Date
+  receivedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Top-level receiving record."""
+type Receiving {
+  id: ID!
+  order: ReceivingOrder!
+  asn: ASN
+}
+
+# -------------------------------------------------
+# Orders
+# -------------------------------------------------
+
+"""The status of an order."""
+type OrderStatus {
+  value: OrderStatusValue!
+  updatedAt: DateTime!
+  reason: String
+}
+
+"""The type classification of an order."""
+type OrderType {
+  value: OrderTypeValue!
+}
+
+"""The originating source of an order."""
+type OrderSource {
+  value: OrderSourceValue!
+  externalOrderId: String
+  channelId: ID
+}
+
+"""A line item quantity."""
+type Quantity {
+  ordered: Int!
+  shipped: Int!
+  cancelled: Int!
+  remaining: Int!
+}
+
+"""Detailed line item within an order."""
+type LineItemDetails {
+  id: ID!
+  orderId: ID!
+  sku: SKU!
+  product: Product
+  variant: Variant
+  quantity: Quantity!
+  unitPrice: Decimal
+  totalPrice: Decimal
+  lotNumber: String
+  serialNumber: String
+  notes: String
+}
+
+"""Reference to an order line item."""
+type LineItem {
+  id: ID!
+  details: LineItemDetails
+}
+
+"""Full details of an order."""
+type OrderDetails {
+  id: ID!
+  orderNumber: String!
+  externalOrderId: String
+  status: OrderStatus!
+  type: OrderType!
+  source: OrderSource!
+  channel: Channel
+  warehouseId: ID!
+  warehouse: Warehouse
+  lineItems: [LineItem!]!
+  shipments: [Shipment!]!
+  shippingAddress: JSON
+  billingAddress: JSON
+  requestedShipDate: Date
+  requiredDeliveryDate: Date
+  shippingMethod: String
+  carrierPreference: String
+  giftMessage: String
+  customerNotes: String
+  internalNotes: String
+  tags: [String!]!
+  metadata: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Top-level order reference."""
+type Order {
+  id: ID!
+  details: OrderDetails
+}
+
+# -------------------------------------------------
+# Carriers / Labels / Packages / Shipments / Tracking
+# -------------------------------------------------
+
+"""Details about a shipping carrier."""
+type CarrierDetails {
+  id: ID!
+  name: String!
+  code: String!
+  trackingUrlTemplate: String
+  supportedServices: [String!]!
+  isActive: Boolean!
+}
+
+"""Reference to a shipping carrier."""
+type Carrier {
+  id: ID!
+  details: CarrierDetails
+}
+
+"""Details of a generated shipping label."""
+type LabelDetails {
+  id: ID!
+  shipmentId: ID!
+  carrier: Carrier!
+  trackingNumber: String!
+  serviceLevel: String!
+  format: LabelFormat!
+  labelUrl: String
+  labelData: String
+  weight: Weight
+  dimensions: Dimensions
+  cost: Decimal
+  generatedAt: DateTime!
+}
+
+"""Reference to a shipping label."""
+type Label {
+  id: ID!
+  details: LabelDetails
+}
+
+"""A tracking event recorded by the carrier."""
+type TrackingEvent {
+  id: ID!
+  shipmentId: ID!
+  trackingNumber: String!
+  carrier: Carrier!
+  status: String!
+  description: String!
+  location: String
+  occurredAt: DateTime!
+  createdAt: DateTime!
+}
+
+"""A physical package within a shipment."""
+type Package {
+  id: ID!
+  shipmentId: ID!
+  trackingNumber: String
+  weight: Weight
+  dimensions: Dimensions
+  label: Label
+  lineItems: [LineItem!]!
+  sealedAt: DateTime
+}
+
+"""Full details of a shipment."""
+type ShipmentDetails {
+  id: ID!
+  orderId: ID!
+  order: Order
+  warehouseId: ID!
+  warehouse: Warehouse
+  status: ShipmentStatus!
+  carrier: Carrier
+  serviceLevel: String
+  trackingNumber: String
+  packages: [Package!]!
+  labels: [Label!]!
+  trackingEvents: [TrackingEvent!]!
+  shippedAt: DateTime
+  estimatedDelivery: Date
+  deliveredAt: DateTime
+  shippingAddress: JSON
+  cost: Decimal
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""The status of a shipment."""
+type ShipmentStatus {
+  value: ShipmentStatusValue!
+  updatedAt: DateTime!
+  description: String
+}
+
+"""Reference to a shipment."""
+type Shipment {
+  id: ID!
+  details: ShipmentDetails
+}
+
+# -------------------------------------------------
+# Returns
+# -------------------------------------------------
+
+"""The status of a return."""
+type ReturnStatus {
+  value: ReturnStatusValue!
+  updatedAt: DateTime!
+  notes: String
+}
+
+"""A line item within a return."""
+type ReturnLineItem {
+  id: ID!
+  returnId: ID!
+  originalOrderLineItemId: ID
+  sku: SKU!
+  quantityReturned: Int!
+  condition: String
+  reason: String
+  disposition: String
+  lotNumber: String
+  serialNumber: String
+  notes: String
+}
+
+"""Full details of a return."""
+type ReturnDetails {
+  id: ID!
+  returnNumber: String!
+  originalOrderId: ID
+  originalOrder: Order
+  warehouseId: ID!
+  warehouse: Warehouse
+  status: ReturnStatus!
+  lineItems: [ReturnLineItem!]!
+  carrier: Carrier
+  trackingNumber: String
+  returnLabel: Label
+  receivedAt: DateTime
+  customerNotes: String
+  internalNotes: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to a return."""
+type Return {
+  id: ID!
+  details: ReturnDetails
+}
+
+# -------------------------------------------------
+# Lot and Serial Tracking
+# -------------------------------------------------
+
+"""Details about a lot-controlled inventory batch."""
+type LotDetails {
+  id: ID!
+  lotNumber: String!
+  skuId: ID!
+  sku: SKU
+  warehouseId: ID!
+  expirationDate: Date
+  manufactureDate: Date
+  quantityOnHand: Int!
+  quantityAvailable: Int!
+  attributes: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to a lot."""
+type Lot {
+  id: ID!
+  details: LotDetails
+}
+
+"""Details about a serialized inventory unit."""
+type SerialDetails {
+  id: ID!
+  serialNumber: String!
+  skuId: ID!
+  sku: SKU
+  warehouseId: ID!
+  lotId: ID
+  lot: Lot
+  status: String!
+  orderId: ID
+  shipmentId: ID
+  returnId: ID
+  attributes: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference to a serialized unit."""
+type Serial {
+  id: ID!
+  details: SerialDetails
+}
+
+# -------------------------------------------------
+# Webhooks
+# -------------------------------------------------
+
+"""A webhook event payload."""
+type WebhookEvent {
+  id: ID!
+  webhookId: ID!
+  eventType: WebhookEventType!
+  payload: JSON!
+  deliveredAt: DateTime
+  responseStatus: Int
+  attempts: Int!
+  createdAt: DateTime!
+}
+
+"""A registered webhook endpoint."""
+type Webhook {
+  id: ID!
+  url: String!
+  secret: String
+  isActive: Boolean!
+  eventTypes: [WebhookEventType!]!
+  recentEvents: [WebhookEvent!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# -------------------------------------------------
+# Auth / API Keys / Tokens
+# -------------------------------------------------
+
+"""An API key for authenticating with the Stord platform."""
+type APIKey {
+  id: ID!
+  name: String!
+  keyPrefix: String!
+  scopes: [String!]!
+  isActive: Boolean!
+  lastUsedAt: DateTime
+  expiresAt: DateTime
+  createdAt: DateTime!
+}
+
+"""A short-lived authentication token."""
+type Token {
+  id: ID!
+  token: String!
+  expiresAt: DateTime!
+  scopes: [String!]!
+  createdAt: DateTime!
+}
+
+# -------------------------------------------------
+# Reports
+# -------------------------------------------------
+
+"""Details about a generated report."""
+type ReportDetails {
+  id: ID!
+  name: String!
+  type: ReportType!
+  status: String!
+  parameters: JSON
+  downloadUrl: String
+  generatedAt: DateTime
+  expiresAt: DateTime
+  createdAt: DateTime!
+}
+
+"""Reference to a report."""
+type Report {
+  id: ID!
+  details: ReportDetails
+}
+
+# -------------------------------------------------
+# Input Types
+# -------------------------------------------------
+
+input OrderFilter {
+  status: OrderStatusValue
+  type: OrderTypeValue
+  source: OrderSourceValue
+  channelId: ID
+  warehouseId: ID
+  createdAfter: DateTime
+  createdBefore: DateTime
+  tags: [String!]
+}
+
+input ProductFilter {
+  isActive: Boolean
+  category: String
+  brand: String
+  tags: [String!]
+  skuCode: String
+}
+
+input InventoryFilter {
+  warehouseId: ID
+  skuId: ID
+  locationId: ID
+  belowThreshold: Int
+}
+
+input ShipmentFilter {
+  status: ShipmentStatusValue
+  orderId: ID
+  warehouseId: ID
+  carrierId: ID
+  shippedAfter: DateTime
+  shippedBefore: DateTime
+}
+
+input ReturnFilter {
+  status: ReturnStatusValue
+  warehouseId: ID
+  createdAfter: DateTime
+  createdBefore: DateTime
+}
+
+input CreateOrderInput {
+  externalOrderId: String
+  type: OrderTypeValue!
+  source: OrderSourceValue!
+  channelId: ID
+  warehouseId: ID!
+  lineItems: [CreateLineItemInput!]!
+  shippingAddress: JSON!
+  billingAddress: JSON
+  requestedShipDate: Date
+  requiredDeliveryDate: Date
+  shippingMethod: String
+  carrierPreference: String
+  giftMessage: String
+  customerNotes: String
+  tags: [String!]
+  metadata: JSON
+}
+
+input CreateLineItemInput {
+  skuId: ID!
+  variantId: ID
+  quantity: Int!
+  unitPrice: Decimal
+  lotNumber: String
+  notes: String
+}
+
+input InventoryAdjustmentInput {
+  skuId: ID!
+  locationId: ID!
+  adjustmentQuantity: Int!
+  reason: AdjustmentReason!
+  notes: String
+  lotNumber: String
+  serialNumbers: [String!]
+}
+
+input CreateASNInput {
+  referenceNumber: String!
+  warehouseId: ID!
+  supplierId: ID
+  supplierName: String
+  expectedArrival: Date
+  carrier: String
+  trackingNumber: String
+  lineItems: [CreateASNLineItemInput!]!
+  notes: String
+}
+
+input CreateASNLineItemInput {
+  skuId: ID!
+  quantityExpected: Int!
+  lotNumber: String
+  serialNumbers: [String!]
+}
+
+input CreateReturnInput {
+  originalOrderId: ID
+  warehouseId: ID!
+  lineItems: [CreateReturnLineItemInput!]!
+  generateLabel: Boolean
+  carrierPreference: String
+  customerNotes: String
+}
+
+input CreateReturnLineItemInput {
+  skuId: ID!
+  quantityReturned: Int!
+  reason: String
+  condition: String
+  originalOrderLineItemId: ID
+}
+
+input CreateWebhookInput {
+  url: String!
+  secret: String
+  eventTypes: [WebhookEventType!]!
+}
+
+input ReportInput {
+  type: ReportType!
+  warehouseId: ID
+  startDate: Date!
+  endDate: Date!
+  parameters: JSON
+}
+
+# -------------------------------------------------
+# Connection Types
+# -------------------------------------------------
+
+type OrderConnection {
+  edges: [OrderEdge!]!
+  pageInfo: PageInfo!
+}
+
+type OrderEdge {
+  node: Order!
+  cursor: String!
+}
+
+type ProductConnection {
+  edges: [ProductEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProductEdge {
+  node: Product!
+  cursor: String!
+}
+
+type InventoryConnection {
+  edges: [InventoryEdge!]!
+  pageInfo: PageInfo!
+}
+
+type InventoryEdge {
+  node: Inventory!
+  cursor: String!
+}
+
+type ShipmentConnection {
+  edges: [ShipmentEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ShipmentEdge {
+  node: Shipment!
+  cursor: String!
+}
+
+type ReturnConnection {
+  edges: [ReturnEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ReturnEdge {
+  node: Return!
+  cursor: String!
+}
+
+# -------------------------------------------------
+# Root Types
+# -------------------------------------------------
+
+type Query {
+  """Fetch a single order by its ID."""
+  order(id: ID!): Order
+
+  """List orders with optional filtering and pagination."""
+  orders(filter: OrderFilter, page: PageInput): OrderConnection!
+
+  """Fetch a single product by its ID."""
+  product(id: ID!): Product
+
+  """List products with optional filtering and pagination."""
+  products(filter: ProductFilter, page: PageInput): ProductConnection!
+
+  """Fetch a SKU by its code."""
+  sku(code: String!): SKU
+
+  """Get inventory details for a SKU across all warehouse locations."""
+  inventory(skuId: ID!): Inventory
+
+  """List inventory with optional filtering."""
+  inventoryList(filter: InventoryFilter, page: PageInput): InventoryConnection!
+
+  """Get inventory levels for a SKU by ID."""
+  inventoryLevels(skuId: ID!): [InventoryLevel!]!
+
+  """Fetch a warehouse by its ID."""
+  warehouse(id: ID!): Warehouse
+
+  """List all warehouses in the network."""
+  warehouses: [Warehouse!]!
+
+  """Fetch an ASN by its ID."""
+  asn(id: ID!): ASN
+
+  """List ASNs for a warehouse."""
+  asns(warehouseId: ID, status: ReceivingStatusValue, page: PageInput): [ASN!]!
+
+  """Fetch a receiving order by its ID."""
+  receivingOrder(id: ID!): ReceivingOrder
+
+  """List receiving orders."""
+  receivingOrders(warehouseId: ID, status: ReceivingStatusValue, page: PageInput): [ReceivingOrder!]!
+
+  """Fetch a shipment by its ID."""
+  shipment(id: ID!): Shipment
+
+  """List shipments with optional filtering."""
+  shipments(filter: ShipmentFilter, page: PageInput): ShipmentConnection!
+
+  """Fetch a return by its ID."""
+  return(id: ID!): Return
+
+  """List returns with optional filtering."""
+  returns(filter: ReturnFilter, page: PageInput): ReturnConnection!
+
+  """Get a lot by its number and SKU."""
+  lot(lotNumber: String!, skuId: ID!): Lot
+
+  """List lots for a SKU."""
+  lots(skuId: ID!, warehouseId: ID): [Lot!]!
+
+  """Get a serialized unit by its serial number."""
+  serial(serialNumber: String!): Serial
+
+  """List webhooks."""
+  webhooks: [Webhook!]!
+
+  """Fetch a specific webhook by ID."""
+  webhook(id: ID!): Webhook
+
+  """List API keys."""
+  apiKeys: [APIKey!]!
+
+  """Fetch a report by its ID."""
+  report(id: ID!): Report
+
+  """List reports."""
+  reports(type: ReportType, page: PageInput): [Report!]!
+
+  """List sales channels."""
+  channels: [Channel!]!
+
+  """Fetch a sales channel by ID."""
+  channel(id: ID!): Channel
+}
+
+type Mutation {
+  """Create a new fulfillment order."""
+  createOrder(input: CreateOrderInput!): Order!
+
+  """Cancel an existing order."""
+  cancelOrder(id: ID!, reason: String): Order!
+
+  """Place an order on hold."""
+  holdOrder(id: ID!, reason: String): Order!
+
+  """Release an order from hold."""
+  releaseOrder(id: ID!): Order!
+
+  """Create an Advanced Shipping Notice for inbound inventory."""
+  createASN(input: CreateASNInput!): ASN!
+
+  """Cancel an ASN."""
+  cancelASN(id: ID!, reason: String): ASN!
+
+  """Adjust inventory quantity at a location."""
+  adjustInventory(input: InventoryAdjustmentInput!): InventoryAdjustment!
+
+  """Initiate a return for an order."""
+  createReturn(input: CreateReturnInput!): Return!
+
+  """Update the status of a return."""
+  updateReturnStatus(id: ID!, status: ReturnStatusValue!, notes: String): Return!
+
+  """Generate a shipping label for a shipment."""
+  generateLabel(shipmentId: ID!, format: LabelFormat): Label!
+
+  """Void a shipping label."""
+  voidLabel(labelId: ID!): Label!
+
+  """Register a new webhook endpoint."""
+  createWebhook(input: CreateWebhookInput!): Webhook!
+
+  """Update an existing webhook."""
+  updateWebhook(id: ID!, url: String, eventTypes: [WebhookEventType!], isActive: Boolean): Webhook!
+
+  """Delete a webhook registration."""
+  deleteWebhook(id: ID!): Boolean!
+
+  """Request a new report to be generated."""
+  generateReport(input: ReportInput!): Report!
+}
+
+type Subscription {
+  """Subscribe to order status changes."""
+  orderStatusChanged(orderId: ID): OrderStatus!
+
+  """Subscribe to new tracking events for a shipment."""
+  trackingEventAdded(shipmentId: ID): TrackingEvent!
+
+  """Subscribe to inventory level changes for a SKU."""
+  inventoryLevelChanged(skuId: ID, warehouseId: ID): InventoryLevel!
+
+  """Subscribe to new webhook events."""
+  webhookEventReceived(webhookId: ID): WebhookEvent!
+}

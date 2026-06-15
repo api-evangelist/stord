@@ -36,5 +36,14 @@
       "category": "Fulfillment",
       "file": "2026-04-24-last-mile-transportation-problems-and-how-to-fix-them.md"
     }
-  ]
+  ],
+  "repo": "stord",
+  "feeds": [
+    {
+      "source": "https://www.linkedin.com/company/stord",
+      "error": "HTTPError"
+    }
+  ],
+  "post_count": 0,
+  "fetched": "2026-06-14T20:42:17Z"
 }

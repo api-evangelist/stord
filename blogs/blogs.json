@@ -40,10 +40,20 @@
   "repo": "stord",
   "feeds": [
     {
+      "source": "https://www.stord.com/rss.xml",
+      "feed_url": "https://www.stord.com/rss.xml",
+      "title": "",
+      "saved": 1,
+      "method": "feed"
+    },
+    {
       "source": "https://www.linkedin.com/company/stord",
-      "error": "HTTPError"
+      "feed_url": "https://www.linkedin.com/company/stord",
+      "title": "",
+      "saved": 0,
+      "method": "none"
     }
   ],
-  "post_count": 0,
-  "fetched": "2026-06-14T20:42:17Z"
+  "post_count": 5,
+  "fetched": "2026-06-27T12:03:07Z"
 }

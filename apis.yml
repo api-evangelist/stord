@@ -58,6 +58,10 @@ apis:
   - url: graphql/stord-graphql.md
     type: GraphQL
 common:
+- type: TrustCenter
+  url: security/stord-trust-center.yml
+- type: DomainSecurity
+  url: security/stord-domain-security.yml
 - type: Website
   url: https://www.stord.com/
 - type: Documentation

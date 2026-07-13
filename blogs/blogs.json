@@ -43,17 +43,14 @@
       "source": "https://www.stord.com/rss.xml",
       "feed_url": "https://www.stord.com/rss.xml",
       "title": "",
-      "saved": 1,
+      "saved": 0,
       "method": "feed"
     },
     {
       "source": "https://www.linkedin.com/company/stord",
-      "feed_url": "https://www.linkedin.com/company/stord",
-      "title": "",
-      "saved": 0,
-      "method": "none"
+      "error": "HTTPError"
     }
   ],
-  "post_count": 5,
-  "fetched": "2026-06-27T12:03:07Z"
+  "post_count": 53,
+  "fetched": "2026-07-11T11:50:51Z"
 }

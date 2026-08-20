@@ -55,6 +55,13 @@ apis:
   humanURL: https://www.stord.com/integrations
   baseURL: https://cloud.stord.com
   tags:
+  - Order
+  - Inventory
+  - Shipments
+  - Returns
+  - Fulfillment
+  - Webhook
+  tags_raw:
   - Orders
   - Inventory
   - Shipments

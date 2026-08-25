@@ -48,13 +48,9 @@
     },
     {
       "source": "https://www.linkedin.com/company/stord",
-      "feed_url": "https://www.linkedin.com/company/stord",
-      "title": "",
-      "saved": 0,
-      "method": "none",
-      "error": "parse_failed"
+      "error": "HTTPError"
     }
   ],
   "post_count": 54,
-  "fetched": "2026-08-15T12:11:08Z"
+  "fetched": "2026-08-22T20:20:02Z"
 }

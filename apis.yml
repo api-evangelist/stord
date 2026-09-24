@@ -84,8 +84,6 @@ apis:
     url: https://www.stord.com/integrations
   - type: OpenAPI
     url: https://www.stord.com/integrations
-  - url: graphql/stord-graphql.md
-    type: GraphQL
 common:
 - type: TrustCenter
   url: security/stord-trust-center.yml

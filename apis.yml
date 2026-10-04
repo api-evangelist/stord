@@ -42,6 +42,19 @@ specificationVersion: '0.23'
 tags:
 - Commerce Fulfillment
 - Order Management
+- Inventory
+- Shipment Tracking
+- Returns Management
+- Warehouse Management
+- Logistics
+- Supply Chain
+- Shopify Integration
+- BigCommerce Integration
+- ERP Integration
+- EDI
+tags_raw:
+- Commerce Fulfillment
+- Order Management
 - Inventory Management
 - Shipment Tracking
 - Returns Management

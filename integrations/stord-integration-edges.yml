@@ -1,0 +1,26 @@
+edges:
+- partner_name: Amazon Selling Partner Appstore
+  partner: amazon-seller-central
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://sellercentral.amazon.com/selling-partner-appstore/dp/amzn1.sp.solution.a1d431d3-ba59-4b71-99ad-f1f90bdbe130
+  mirror_of: amazon-seller-central/integrations/amazon-seller-central-integration-edges.yml
+  apps:
+  - Stord
+  detected: '2026-10-21'
+  detected_by: sweep-amazon-sp-api-appstore.py
+generated: '2026-10-21'
+method: searched
+source:
+- https://sellercentral.amazon.com/selling-partner-appstore
+- https://advertising.amazon.com/partners/directory
+- https://sellercentral.amazon.com/gspn
+checked:
+- https://advertising.amazon.com/partners/directory
+- https://sellercentral.amazon.com/gspn
+- https://sellercentral.amazon.com/selling-partner-appstore
